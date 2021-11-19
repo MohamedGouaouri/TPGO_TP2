@@ -15,11 +15,11 @@ def test1():
 def test2():
     g = nx.Graph()
     g.add_nodes_from([1, 2, 3, 4, 5])
-    g.add_edges_from([(1, 2), (2, 4), (4, 5), (3, 6), (3, 7), (6, 7)])
+    g.add_edges_from([(1, 2), (2, 4), (4, 5), (3, 6), (3, 7), (6, 7), (8, 9)])
     graphs = get_connexed_Graphs_lists(g)
     # get_connexed_Graph_from_node(g , 1,  my_nodes , all_visited_nodes)
-    for  i in range(len(graphs)):
-        print("#### Graph ", i+1, "\n")
+    for i in range(len(graphs)):
+        print("#### Graph ", i + 1, "\n")
         print("Nodes : ", graphs[i].nodes(), "\n")
         print("Edges :", graphs[i].edges(), "\n")
     # cut_nodes = findArticulationPoints(g, number_of_nodes(g))
