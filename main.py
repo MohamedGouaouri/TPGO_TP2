@@ -29,13 +29,20 @@ def get_connexed_Graph_from_node(g : nx.Graph , nodeIndex : int , visitedNodes ,
 
 def get_connexed_Graphs_lists(g: nx.Graph):
     graphNodes=g.nodes()
+    graphEdges=g.edges()
     all_nodes_visted=[]
     graphs=[]
     for nodeIndex in graphNodes:
         if not(nodeIndex in all_nodes_visted):
             visitedNodes=[]
             get_connexed_Graph_from_node(g , nodeIndex , visitedNodes , all_nodes_visted)
-            graphs.append(visitedNodes)
+            new_g = nx.Graph()
+            print("visited Nodes =", visitedNodes)
+            new_g.add_nodes_from(visitedNodes)
+            for edgeTuple in graphEdges:
+                if edgeTuple[0] in visitedNodes:
+                    new_g.add_edge(edgeTuple[0],  edgeTuple[1])
+            graphs.append(new_g)
     return graphs
 
 def findArticulationPoints(g: nx.Graph, graph_degree: int):
