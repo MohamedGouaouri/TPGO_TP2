@@ -1,21 +1,21 @@
 import networkx as nx
 
-# graphs=[]
-# all_nodes_visted=[]
-# subgraph_nodes_visited=[]
+
+
+
 
 def init_visited(length: int):
     return [False for _ in range(length)]
 
 
 
-def dfs(g: nx.Graph, node_idx: int) -> None:
+def dfs(g: nx.Graph, node_idx: int, visited, mapping, reverse_mapping) -> None:
     if visited[node_idx]:
         return
     visited[node_idx] = True
-    for node in g.neighbors(node_idx + 1):
-        dfs(g, node - 1)
-    print("VISITED = ", visited)
+    for node in g.neighbors(mapping[node_idx]):
+        dfs(g, reverse_mapping[node], visited, mapping, reverse_mapping)
+    return visited
 
 def get_connexed_Graph_from_node(g : nx.Graph , nodeIndex : int , visitedNodes , all_nodes_visited):
     # global subgraph_nodes_visited
@@ -37,7 +37,7 @@ def get_connexed_Graphs_lists(g: nx.Graph):
             visitedNodes=[]
             get_connexed_Graph_from_node(g , nodeIndex , visitedNodes , all_nodes_visted)
             new_g = nx.Graph()
-            print("visited Nodes =", visitedNodes)
+            # print("visited Nodes =", visitedNodes)
             new_g.add_nodes_from(visitedNodes)
             for edgeTuple in graphEdges:
                 if edgeTuple[0] in visitedNodes:
@@ -45,20 +45,52 @@ def get_connexed_Graphs_lists(g: nx.Graph):
             graphs.append(new_g)
     return graphs
 
+def mapping(g):
+    m = {}
+    i = 0
+    for node in g.nodes():
+        m[i] = node
+        i += 1
+    return m
+def reverse_mapping(g):
+    m = {}
+    i = 0
+    for node in g.nodes():
+        m[node] = i
+        i += 1
+    return m
+
 def findArticulationPoints(g: nx.Graph, graph_degree: int):
-    global visited
     cut_nodes = []
     for i in range(graph_degree):
         ## remove node
         cloned = g.copy()
-        cloned.remove_node(i + 1)
+        m = mapping(g)
+        rm = reverse_mapping(g)
+        cloned.remove_node(m[i])
+        
         for j in range(graph_degree):
             if j != i:
                 visited = init_visited(graph_degree)
-                dfs(cloned, j)
+                dfs(cloned, j, visited, m, rm)
                 visited.pop(i)
                 if not all(visited):
                     # i is an articulation point
-                    if not i + 1 in cut_nodes:
-                        cut_nodes.append(i + 1)
+                    if not m[i] in cut_nodes:
+                        cut_nodes.append(m[i])
     return cut_nodes
+
+
+
+def main():
+    g = nx.Graph()
+    g.add_nodes_from([1, 2, 3, 4, 5, 6, 7, 8, 9])
+    g.add_edges_from([(1, 2), (2, 4), (4, 5), (3, 6), (3, 7), (6, 7), (8, 9)])
+    articulation_points = set()
+    for subgraph in get_connexed_Graphs_lists(g):
+        articulation_points = articulation_points.union(set(findArticulationPoints(subgraph, nx.number_of_nodes(subgraph))))
+    print(set(list(nx.articulation_points(g))))
+    print(articulation_points)
+
+
+main()
